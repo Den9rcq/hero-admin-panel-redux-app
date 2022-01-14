@@ -1,48 +1,89 @@
-
-
-// Задача для этого компонента:
-// Реализовать создание нового героя с введенными данными. Он должен попадать
-// в общее состояние и отображаться в списке + фильтроваться
-// Уникальный идентификатор персонажа можно сгенерировать через uiid
-// Усложненная задача:
-// Персонаж создается и в файле json при помощи метода POST
 // Дополнительно:
 // Элементы <option></option> желательно сформировать на базе
 // данных из фильтров
+import { v4 as uuidv4 } from 'uuid';
+
+import { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useHttp } from "../../hooks/http.hook";
+import { heroesFetched, heroesFetching, heroesFetchingError } from "../../actions";
 
 const HeroesAddForm = () => {
+    const { heroes } = useSelector(state => state);
+    const dispatch = useDispatch();
+    const { request } = useHttp();
+
+    const [formData, setFormData] = useState({
+        name: '',
+        description: '',
+        element: ''
+    })
+
+    const handlerChange = ({ name, value }) => {
+        setFormData(prevState => ({
+            ...prevState,
+            [name]: value
+        }))
+    }
+
+    const handleSubmit = (e) => {
+        e.preventDefault()
+        dispatch(heroesFetching())
+        const newHero = {
+            id: uuidv4(),
+            ...formData
+        }
+        request("http://localhost:3001/heroes", "POST", JSON.stringify(newHero))
+            .then(data => dispatch(heroesFetched([...heroes, data])))
+            .catch(() => dispatch(heroesFetchingError()))
+
+        setFormData({
+            name: '',
+            description: '',
+            element: ''
+        })
+    }
     return (
-        <form className="border p-4 shadow-lg rounded">
+        <form className="border p-4 shadow-lg rounded" onSubmit={(e) => handleSubmit(e)}>
             <div className="mb-3">
                 <label htmlFor="name" className="form-label fs-4">Имя нового героя</label>
-                <input 
+                <input
+                    onChange={({ target }) => handlerChange(target)}
+                    value={formData.name}
                     required
-                    type="text" 
-                    name="name" 
-                    className="form-control" 
-                    id="name" 
-                    placeholder="Как меня зовут?"/>
+                    type="text"
+                    name="name"
+                    className="form-control"
+                    id="name"
+                    placeholder="Как меня зовут?"
+                />
             </div>
 
             <div className="mb-3">
                 <label htmlFor="text" className="form-label fs-4">Описание</label>
                 <textarea
+                    onChange={({ target }) => handlerChange(target)}
+                    value={formData.description}
                     required
-                    name="text" 
-                    className="form-control" 
-                    id="text" 
+                    name="description"
+                    className="form-control"
+                    id="text"
                     placeholder="Что я умею?"
-                    style={{"height": '130px'}}/>
+                    style={{ "height": '130px' }}
+                />
             </div>
 
             <div className="mb-3">
                 <label htmlFor="element" className="form-label">Выбрать элемент героя</label>
-                <select 
+                <select
+                    onChange={({ target }) => handlerChange(target)}
+                    value={formData.element}
                     required
-                    className="form-select" 
-                    id="element" 
-                    name="element">
-                    <option >Я владею элементом...</option>
+                    className="form-select"
+                    id="element"
+                    name="element"
+                >
+                    <option value="">Я владею элементом...</option>
                     <option value="fire">Огонь</option>
                     <option value="water">Вода</option>
                     <option value="wind">Ветер</option>
