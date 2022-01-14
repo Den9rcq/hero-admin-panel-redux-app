@@ -4,12 +4,11 @@
 import { v4 as uuidv4 } from 'uuid';
 
 import { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { useHttp } from "../../hooks/http.hook";
-import { heroesFetched, heroesFetching, heroesFetchingError } from "../../actions";
+import { heroCreated, heroesFetchingError } from "../../actions";
 
 const HeroesAddForm = () => {
-    const { heroes } = useSelector(state => state);
     const dispatch = useDispatch();
     const { request } = useHttp();
 
@@ -28,13 +27,12 @@ const HeroesAddForm = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault()
-        dispatch(heroesFetching())
         const newHero = {
             id: uuidv4(),
             ...formData
         }
         request("http://localhost:3001/heroes", "POST", JSON.stringify(newHero))
-            .then(data => dispatch(heroesFetched([...heroes, data])))
+            .then(hero => dispatch(heroCreated(hero)))
             .catch(() => dispatch(heroesFetchingError()))
 
         setFormData({
