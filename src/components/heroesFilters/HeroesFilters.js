@@ -41,6 +41,7 @@ const HeroesFilters = () => {
             return (
                 <button
                     key={name}
+                    id={name}
                     className={btnClass}
                     onClick={() => onActiveFilter(name)}
                 >
