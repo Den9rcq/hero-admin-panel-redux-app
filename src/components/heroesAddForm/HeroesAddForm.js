@@ -6,7 +6,7 @@ import { useHttp } from "../../hooks/http.hook";
 import { heroCreated, heroesFetchingError } from "../../actions";
 
 const HeroesAddForm = () => {
-    const { filters, filtersLoadingStatus } = useSelector(state => state)
+    const { filters, filtersLoadingStatus } = useSelector(state => state.filters)
     const dispatch = useDispatch();
     const { request } = useHttp();
 
