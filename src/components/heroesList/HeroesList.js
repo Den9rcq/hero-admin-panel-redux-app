@@ -13,19 +13,19 @@ const HeroesList = () => {
         ({ filters }) => filters.activeFilter,
         ({ heroes }) => heroes,
         (activeFilter, heroes) => (
-            activeFilter === 'all' ?
-                heroes.heroes :
-                heroes.heroes.filter(item => item.element === activeFilter)
+            activeFilter === 'all'
+                ? heroes.heroes
+                : heroes.heroes.filter(item => item.element === activeFilter)
         )
     )
 
     const filteredHeroes = useSelector(filteredHeroesSelector)
-    const heroesLoadingStatus = useSelector(state => state.heroes.heroesLoadingStatus);
+    const { heroesLoadingStatus } = useSelector(state => state.heroes);
     const dispatch = useDispatch();
     const { request } = useHttp();
 
     useEffect(() => {
-        dispatch(heroesFetching());
+        dispatch('HEROES_FETCHING');
         request("http://localhost:3001/heroes")
             .then(data => dispatch(heroesFetched(data)))
             .catch(() => dispatch(heroesFetchingError()))
