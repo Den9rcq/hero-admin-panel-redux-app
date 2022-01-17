@@ -1,18 +1,15 @@
 import { useDispatch, useSelector } from "react-redux";
-import { useHttp } from "../../hooks/http.hook";
 import { useEffect } from "react";
-import { fetchFilters } from "../../actions";
 import Spinner from "../spinner/Spinner";
 import classNames from "classnames";
-import { activeFilterChanged } from "./filtersSlice";
+import { fetchFilters, activeFilterChanged } from "./filtersSlice";
 
 const HeroesFilters = () => {
     const { filters, filtersLoadingStatus, activeFilter } = useSelector(state => state.filters)
     const dispatch = useDispatch();
-    const { request } = useHttp();
 
     useEffect(() => {
-        dispatch(fetchFilters(request))
+        dispatch(fetchFilters())
 
         // eslint-disable-next-line
     }, [])
@@ -34,7 +31,7 @@ const HeroesFilters = () => {
 
         return arr.map(({ name, label, className }) => {
             const btnClass = classNames('btn', className, {
-                'active' : activeFilter === name
+                'active': activeFilter === name
             })
             return (
                 <button
