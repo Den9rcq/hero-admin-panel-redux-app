@@ -1,10 +1,11 @@
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice, createEntityAdapter, createSelector } from "@reduxjs/toolkit";
 import { useHttp } from "../../hooks/http.hook";
 
-const initialState = {
-    heroes: [],
-    heroesLoadingStatus: 'idle',
-}
+const heroAdapter = createEntityAdapter()
+const initialState = heroAdapter.getInitialState({
+    heroesLoadingStatus: 'idle'
+})
+
 
 export const fetchHeroes = createAsyncThunk(
     'heroes/fetchHeroes',
@@ -19,10 +20,10 @@ const heroesSlice = createSlice({
     initialState,
     reducers: {
         heroCreated: (state, action) => {
-            state.heroes.push(action.payload)
+            heroAdapter.addOne(state, action.payload)
         },
         heroDeleted: (state, action) => {
-            state.heroes = state.heroes.filter(hero => hero.id !== action.payload)
+            heroAdapter.removeOne(state, action.payload)
         }
     },
     extraReducers: builder => {
@@ -31,15 +32,29 @@ const heroesSlice = createSlice({
                 state.heroesLoadingStatus = 'loading'
             })
             .addCase(fetchHeroes.fulfilled, (state, action) => {
-                state.heroes = action.payload
+                heroAdapter.setAll(state, action.payload)
                 state.heroesLoadingStatus = 'idle'
             })
             .addCase(fetchHeroes.rejected, state => {
                 state.heroesLoadingStatus = 'error'
             })
-            .addDefaultCase(() => {})
+            .addDefaultCase(() => {
+            })
     }
 })
+
+const { selectAll } = heroAdapter.getSelectors(state => state.heroes)
+
+// Передача селектора с отфильтрованными героями
+export const filteredHeroesSelector = createSelector(
+    (state) => state.filters.activeFilter,
+    (state) => selectAll(state),
+    (activeFilter, heroes) => (
+        activeFilter === 'all'
+            ? heroes
+            : heroes.filter(item => item.element === activeFilter)
+    )
+)
 
 const { actions, reducer } = heroesSlice
 

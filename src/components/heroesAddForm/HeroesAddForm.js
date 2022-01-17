@@ -4,9 +4,11 @@ import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useHttp } from "../../hooks/http.hook";
 import { heroCreated } from "../heroesList/heroesSlice";
+import { selectAll } from "../heroesFilters/filtersSlice";
 
 const HeroesAddForm = () => {
-    const { filters, filtersLoadingStatus } = useSelector(state => state.filters)
+    const filters = useSelector(selectAll)
+    const { filtersLoadingStatus } = useSelector(state => state.filters)
     const dispatch = useDispatch();
     const { request } = useHttp();
 
