@@ -37,17 +37,13 @@ const heroesSlice = createSlice({
             .addCase(fetchHeroes.rejected, state => {
                 state.heroesLoadingStatus = 'error'
             })
-            .addDefaultCase(() => {
-            })
+            .addDefaultCase(() => {})
     }
 })
 
 const { actions, reducer } = heroesSlice
 
 export const {
-    heroesFetching,
-    heroesFetched,
-    heroesFetchingError,
     heroCreated,
     heroDeleted
 } = actions
